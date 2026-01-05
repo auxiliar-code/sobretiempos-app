@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body { font-family: Arial; background:#f0f2f5; margin:0 }
+    .container {
+      max-width:550px; margin:40px auto; padding:25px;
+      border-radius:12px; background:#f4f4f9;
+      box-shadow:0 6px 15px rgba(0,0,0,.1);
+      text-align:center;
+    }
+    .btn {
+      background:#1b8f5a; color:#fff; border:none;
+      border-radius:6px; padding:10px; width:100%;
+      margin-top:12px;
+    }
+    .btn.secondary { background:#ccc; color:#333 }
+    .pantalla { display:none }
+    .msg { margin-top:15px; padding:10px; border-radius:6px }
+    .ok { background:#e6f7ef; color:#1b8f5a }
+    .error { background:#fdecea; color:#b00020 }
+    input, select, textarea { width:100%; padding:8px; margin-top:6px }
+  </style>
+</head>
+
+<body>
+
+<div id="inicio" class="container pantalla" style="display:block">
+ <img src="assets/logo.png" alt="Logo empresa" style="max-width:160px;margin-bottom:15px">
+  <h2>Sistema de Sobretiempos</h2>
+  <button class="btn" onclick="mostrar('sobretiempo')">Sobretiempo</button>
+  <button class="btn" onclick="mostrar('reposicion')">Reposición</button>
+  <button class="btn" onclick="mostrar('consulta')">Consulta</button>
+</div>
+
+<div id="sobretiempo" class="container pantalla">
+  <select id="empSobretiempo"></select>
+  <input type="date" id="fechaSobretiempo">
+  <input type="time" id="horaEntrada">
+  <input type="time" id="horaSalida">
+  <textarea id="justificacion"></textarea>
+  <button class="btn" onclick="registrarSobretiempo()">Registrar</button>
+  <div id="msgSobretiempo" class="msg"></div>
+  <button class="btn secondary" onclick="volver()">Volver</button>
+</div>
+
+<div id="reposicion" class="container pantalla">
+  <select id="empReposicion"></select>
+  <input type="number" id="horasReposicion">
+  <textarea id="justificacionReposicion"></textarea>
+  <button class="btn" onclick="registrarReposicion()">Registrar</button>
+  <div id="msgReposicion" class="msg"></div>
+  <button class="btn secondary" onclick="volver()">Volver</button>
+</div>
+
+<div id="consulta" class="container pantalla">
+  <input type="password" id="idInterno">
+  <button class="btn" onclick="consultarSaldo()">Consultar</button>
+  <div id="resultadoSaldo" class="msg"></div>
+  <button class="btn secondary" onclick="volver()">Volver</button>
+</div>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbx5IRdG-I0Ykq3U0VzvXqUKE0DUSth_M2qi0Bw5ZOwaGttUqZ96XQQcsDkp2RVgx-J8/exec';
+
+function mostrar(id){
+  document.querySelectorAll('.pantalla').forEach(p=>p.style.display='none');
+  document.getElementById(id).style.display='block';
+}
+function volver(){ mostrar('inicio'); }
+
+function post(data){
+  return fetch(API,{
+    method:'POST',
+    body:JSON.stringify(data)
+  }).then(r=>r.json());
+}
+
+function cargarEmpleados(){
+  post({action:'empleados'}).then(emps=>{
+    empSobretiempo.innerHTML = empReposicion.innerHTML =
+      '<option value="">Seleccione</option>';
+    emps.forEach(e=>{
+      empSobretiempo.add(new Option(e.nombre,e.id));
+      empReposicion.add(new Option(e.nombre,e.id));
+    });
+  });
+}
+
+function registrarSobretiempo(){
+  post({
+    action:'sobretiempo',
+    idEmpleado:empSobretiempo.value,
+    fecha:fechaSobretiempo.value,
+    horaEntrada:horaEntrada.value || null,
+    horaSalida:horaSalida.value,
+    justificacion:justificacion.value
+  }).then(r=>{
+    msgSobretiempo.className='msg ok';
+    msgSobretiempo.innerHTML=`✔ ${r.horas}h ${r.minutos}m`;
+  });
+}
+
+function registrarReposicion(){
+  post({
+    action:'reposicion',
+    idEmpleado:empReposicion.value,
+    horas:Number(horasReposicion.value),
+    justificacion:justificacionReposicion.value
+  }).then(()=>{
+    msgReposicion.className='msg ok';
+    msgReposicion.innerHTML='✔ Reposición registrada';
+  });
+}
+
+function consultarSaldo(){
+  post({action:'saldo', id:idInterno.value}).then(r=>{
+    resultadoSaldo.className='msg ok';
+    resultadoSaldo.innerHTML=`⏱ ${r.horas}h ${r.minutos}m`;
+  });
+}
+
+window.onload = cargarEmpleados;
+</script>
+
+</body>
+</html>
