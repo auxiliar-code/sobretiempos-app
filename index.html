@@ -197,6 +197,9 @@ function registrarSobretiempo(){
     `✔ Se han registrado ${r.horas} horas ${r.minutos} minutos de sobretiempo`,
     'success'
   );
+  .catch(err => {
+  mostrarToast(err.mensaje || 'Error al registrar', 'error');
+});
   limpiarSobretiempo();
 });
 
@@ -213,6 +216,9 @@ function registrarReposicion(){
     `✔ Se han repuesto ${horasReposicion.value} horas correctamente`,
     'success'
   );
+    .catch(err => {
+  mostrarToast(err.mensaje || 'Error al registrar', 'error');
+});
   limpiarReposicion();
 });
 
@@ -261,3 +267,4 @@ function limpiarReposicion() {
 
 </body>
 </html>
+
