@@ -201,6 +201,11 @@ input:focus, select:focus, textarea:focus {
   <i class="fa-solid fa-magnifying-glass"></i> Consultar Saldo
 </button>
 
+  <button class="btn secondary" onclick="salirApp()">
+  <i class="fa-solid fa-right-from-bracket"></i> Salir
+</button>
+
+
 </div>
 
 <div id="sobretiempo" class="container pantalla">
@@ -223,6 +228,9 @@ input:focus, select:focus, textarea:focus {
   <button class="btn" id="btnSobretiempo" onclick="registrarSobretiempo()">
   <i class="fa-solid fa-floppy-disk"></i> Registrar
 </button>
+<button class="btn secondary" onclick="limpiarSobretiempo()">
+  <i class="fa-solid fa-broom"></i> Limpiar
+</button>
 
   <div id="msgSobretiempo" class="msg"></div>
   <button class="btn secondary" onclick="volver()">Volver</button>
@@ -244,6 +252,9 @@ input:focus, select:focus, textarea:focus {
   <button class="btn" onclick="registrarReposicion()">
   <i class="fa-solid fa-floppy-disk"></i> Registrar
 </button>
+<button class="btn secondary" onclick="limpiarReposicion()">
+  <i class="fa-solid fa-broom"></i> Limpiar
+</button>
 
   <div id="msgReposicion" class="msg"></div>
     <button class="btn secondary" onclick="volver()">
@@ -264,7 +275,11 @@ input:focus, select:focus, textarea:focus {
   <button class="btn" onclick="consultarSaldo()">
   <i class="fa-solid fa-floppy-disk"></i> Consultar
 </button>
+<button class="btn secondary" onclick="limpiarConsulta()">
+  <i class="fa-solid fa-broom"></i> Limpiar
+</button>
 
+  
   <div id="resultadoSaldo" class="msg"></div>
   <button class="btn secondary" onclick="volver()">
   <i class="fa-solid fa-arrow-left"></i> Volver
@@ -374,12 +389,10 @@ function registrarReposicion() {
     justificacion: justificacionReposicion.value
   })
   .then(() => {
-    mostrarToast(
-      `✔ Se han repuesto ${horasReposicion.value} horas correctamente`,
-      'success'
-    );
-    limpiarReposicion();
-  })
+  mostrarCheckExito(`Se han repuesto ${horasReposicion.value} horas correctamente`);
+  limpiarReposicion();
+})
+
   .catch(err => {
     mostrarToast(err.error || 'Error al registrar reposición', 'error');
   });
@@ -388,10 +401,10 @@ function registrarReposicion() {
 
 function consultarSaldo(){
   post({action:'saldo', id:idInterno.value}).then(r => {
-  mostrarToast(
-    `⏱ Saldo disponible: ${r.horas} horas ${r.minutos} minutos`,
-    'warning'
+  mostrarSaldoModal(
+    `Saldo disponible: ${r.horas} horas ${r.minutos} minutos`
   );
+  limpiarConsulta();
 });
 }
  
@@ -434,6 +447,25 @@ function mostrarCheckExito(texto) {
   }, 2500);
 }
 
+function mostrarSaldoModal(texto) {
+  document.getElementById('saldoText').innerText = texto;
+  document.getElementById('saldoBox').style.display = 'block';
+}
+
+  function cerrarSaldo() {
+  document.getElementById('saldoBox').style.display = 'none';
+}
+
+function salirApp() {
+  if (confirm('¿Desea salir del sistema?')) {
+    window.location.reload();
+  }
+}
+
+  function limpiarConsulta() {
+  idInterno.value = '';
+}
+
   
 </script>
 
@@ -448,9 +480,18 @@ function mostrarCheckExito(texto) {
   <div id="successText"></div>
 </div>
 
+  <div id="saldoBox" class="success-box" style="background:#fff7e6; display:none">
+  <i class="fa-solid fa-clock" style="color:#f1c40f"></i>
+  <div id="saldoText" style="color:#333; margin-top:10px"></div>
+  <button class="btn secondary" style="margin-top:15px" onclick="cerrarSaldo()">
+    <i class="fa-solid fa-xmark"></i> Cerrar
+  </button>
+</div>
+
   
 </body>
 </html>
+
 
 
 
