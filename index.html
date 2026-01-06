@@ -183,46 +183,58 @@ function cargarEmpleados(){
   });
 }
 
-function registrarSobretiempo(){
+function registrarSobretiempo() {
+
+  if (!empSobretiempo.value || !fechaSobretiempo.value || !horaSalida.value) {
+    mostrarToast('Complete todos los campos obligatorios', 'error');
+    return;
+  }
+
   post({
-    action:'sobretiempo',
-    idEmpleado:empSobretiempo.value,
-    fecha:fechaSobretiempo.value,
-    horaEntrada:horaEntrada.value || null,
-    horaSalida:horaSalida.value,
-    justificacion:justificacion.value
+    action: 'sobretiempo',
+    idEmpleado: empSobretiempo.value,
+    fecha: fechaSobretiempo.value,
+    horaEntrada: horaEntrada.value || null,
+    horaSalida: horaSalida.value,
+    justificacion: justificacion.value
   })
-.then(r => {
-  mostrarToast(
-    `✔ Se han registrado ${r.horas} horas ${r.minutos} minutos de sobretiempo`,
-    'success'
-  );
+  .then(r => {
+    mostrarToast(
+      `✔ Se han registrado ${r.horas} horas ${r.minutos} minutos de sobretiempo`,
+      'success'
+    );
+    limpiarSobretiempo();
+  })
   .catch(err => {
-  mostrarToast(err.mensaje || 'Error al registrar', 'error');
-});
-  limpiarSobretiempo();
-});
-
+    mostrarToast(err.error || 'Error al registrar sobretiempo', 'error');
+  });
 }
 
-function registrarReposicion(){
+function registrarReposicion() {
+
+  if (!empReposicion.value || !horasReposicion.value) {
+    mostrarToast('Debe seleccionar empleado y horas', 'error');
+    return;
+  }
+
   post({
-    action:'reposicion',
-    idEmpleado:empReposicion.value,
-    horas:Number(horasReposicion.value),
-    justificacion:justificacionReposicion.value
-  }).then(() => {
-  mostrarToast(
-    `✔ Se han repuesto ${horasReposicion.value} horas correctamente`,
-    'success'
-  );
-    .catch(err => {
-  mostrarToast(err.mensaje || 'Error al registrar', 'error');
-});
-  limpiarReposicion();
-});
-
+    action: 'reposicion',
+    idEmpleado: empReposicion.value,
+    horas: Number(horasReposicion.value),
+    justificacion: justificacionReposicion.value
+  })
+  .then(() => {
+    mostrarToast(
+      `✔ Se han repuesto ${horasReposicion.value} horas correctamente`,
+      'success'
+    );
+    limpiarReposicion();
+  })
+  .catch(err => {
+    mostrarToast(err.error || 'Error al registrar reposición', 'error');
+  });
 }
+
 
 function consultarSaldo(){
   post({action:'saldo', id:idInterno.value}).then(r => {
@@ -267,4 +279,5 @@ function limpiarReposicion() {
 
 </body>
 </html>
+
 
