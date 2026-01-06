@@ -299,15 +299,21 @@ function volver() {
 }
 
 
-function post(data){
-  return fetch(API,{
+function post(data) {
+  const form = new URLSearchParams();
+
+  for (let k in data) {
+    if (data[k] !== null && data[k] !== undefined) {
+      form.append(k, data[k]);
+    }
+  }
+
+  return fetch(API, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
+    body: form
   }).then(r => r.json());
 }
+
 
 
 function cargarEmpleados(){
@@ -445,6 +451,7 @@ function mostrarCheckExito(texto) {
   
 </body>
 </html>
+
 
 
 
