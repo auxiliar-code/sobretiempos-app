@@ -177,15 +177,6 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-    
-    function mostrarLoader() {
-  document.getElementById('loader').style.display = 'flex';
-}
-
-function ocultarLoader() {
-  document.getElementById('loader').style.display = 'none';
-}
-
   </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -283,7 +274,14 @@ function ocultarLoader() {
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbx5IRdG-I0Ykq3U0VzvXqUKE0DUSth_M2qi0Bw5ZOwaGttUqZ96XQQcsDkp2RVgx-J8/exec';
+ function mostrarLoader() {
+  document.getElementById('loader').style.display = 'flex';
+}
 
+function ocultarLoader() {
+  document.getElementById('loader').style.display = 'none';
+}
+  
 function mostrar(id) {
   document.querySelectorAll('.pantalla').forEach(p => {
     p.classList.remove('activa');
@@ -303,10 +301,14 @@ function volver() {
 
 function post(data){
   return fetch(API,{
-    method:'POST',
-    body:JSON.stringify(data)
-  }).then(r=>r.json());
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  }).then(r => r.json());
 }
+
 
 function cargarEmpleados(){
   post({action:'empleados'}).then(emps=>{
@@ -443,6 +445,7 @@ function mostrarCheckExito(texto) {
   
 </body>
 </html>
+
 
 
 
