@@ -382,6 +382,8 @@ function registrarReposicion() {
     return;
   }
 
+  mostrarLoader();
+
   post({
     action: 'reposicion',
     idEmpleado: empReposicion.value,
@@ -389,38 +391,43 @@ function registrarReposicion() {
     justificacion: justificacionReposicion.value
   })
   .then(() => {
-  mostrarCheckExito(`Se han repuesto ${horasReposicion.value} horas correctamente`);
-  limpiarReposicion();
-})
-
+    mostrarCheckExito(`Se han repuesto ${horasReposicion.value} horas correctamente`);
+    limpiarReposicion();
+  })
   .catch(err => {
     mostrarToast(err.error || 'Error al registrar reposición', 'error');
+  })
+  .finally(() => {
+    ocultarLoader();
   });
 }
 
 
-function consultarSaldo(){
-  post({action:'saldo', id:idInterno.value}).then(r => {
-  mostrarSaldoModal(
-    `Saldo disponible: ${r.horas} horas ${r.minutos} minutos`
-  );
-  limpiarConsulta();
-});
+
+function consultarSaldo() {
+
+  if (!idInterno.value) {
+    mostrarToast('Ingrese su ID', 'error');
+    return;
+  }
+
+  mostrarLoader();
+
+  post({ action:'saldo', id:idInterno.value })
+    .then(r => {
+      mostrarSaldoModal(
+        `Saldo disponible: ${r.horas} horas ${r.minutos} minutos`
+      );
+      limpiarConsulta();
+    })
+    .catch(err => {
+      mostrarToast(err.error || 'Error al consultar saldo', 'error');
+    })
+    .finally(() => {
+      ocultarLoader();
+    });
 }
- 
-window.onload = cargarEmpleados;
 
-function mostrarToast(mensaje, tipo = 'success') {
-  const toast = document.getElementById('toast');
-  toast.className = `toast ${tipo}`;
-  toast.innerHTML = mensaje;
-
-  setTimeout(() => toast.classList.add('show'), 50);
-
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3500);
-}
 
 function limpiarSobretiempo() {
   empSobretiempo.value = '';
@@ -457,9 +464,26 @@ function mostrarSaldoModal(texto) {
 }
 
 function salirApp() {
-  if (confirm('¿Desea salir del sistema?')) {
-    window.location.reload();
-  }
+  if (!confirm('¿Desea salir del sistema?')) return;
+
+  // Intenta cerrar la pestaña
+  window.open('', '_self');
+  window.close();
+
+  // Fallback (si el navegador no permite cerrar)
+  setTimeout(() => {
+    document.body.innerHTML = `
+      <div style="
+        display:flex;
+        height:100vh;
+        align-items:center;
+        justify-content:center;
+        font-family:Arial;
+        color:#555;
+      ">
+        <h3>Puede cerrar esta pestaña con seguridad.</h3>
+      </div>`;
+  }, 200);
 }
 
   function limpiarConsulta() {
@@ -491,6 +515,7 @@ function salirApp() {
   
 </body>
 </html>
+
 
 
 
