@@ -241,293 +241,175 @@ input:focus, select:focus, textarea:focus {
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbx5IRdG-I0Ykq3U0VzvXqUKE0DUSth_M2qi0Bw5ZOwaGttUqZ96XQQcsDkp2RVgx-J8/exec';
- function mostrarLoader() {
+let usuarioLogueado = null;
+
+// --- GESTIÓN DE INTERFAZ ---
+
+function mostrarLoader() {
   document.getElementById('loader').style.display = 'flex';
 }
 
 function ocultarLoader() {
   document.getElementById('loader').style.display = 'none';
 }
-  
+
 function mostrar(id) {
   document.querySelectorAll('.pantalla').forEach(p => {
     p.classList.remove('activa');
     p.style.display = 'none';
   });
-
   const pantalla = document.getElementById(id);
   pantalla.style.display = 'block';
-
   setTimeout(() => pantalla.classList.add('activa'), 10);
 }
 
-function volver() {
-  mostrar('inicio');
-}
-
-
-function post(data) {
-  const form = new URLSearchParams();
-
-  for (let k in data) {
-    if (data[k] !== null && data[k] !== undefined) {
-      form.append(k, data[k]);
-    }
-  }
-
-  return fetch(API, {
-    method: 'POST',
-    body: form
-  }).then(r => r.json());
-}
-
-
-
-function cargarEmpleados(){
-  post({action:'empleados'}).then(emps=>{
-    empSobretiempo.innerHTML = empReposicion.innerHTML =
-      '<option value="">Seleccione</option>';
-    emps.forEach(e=>{
-      empSobretiempo.add(new Option(e.nombre,e.id));
-      empReposicion.add(new Option(e.nombre,e.id));
-    });
-  });
-}
-
-function registrarSobretiempo() {
-
-  if (!empSobretiempo.value || !fechaSobretiempo.value || !horaSalida.value) {
-    mostrarToast('Complete todos los campos obligatorios', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('btnSobretiempo');
-  btn.disabled = true;
-  mostrarLoader();
-
-  post({
-    action: 'sobretiempo',
-    idEmpleado: empSobretiempo.value,
-    fecha: fechaSobretiempo.value,
-    horaEntrada: horaEntrada.value || null,
-    horaSalida: horaSalida.value,
-    justificacion: justificacion.value
-  })
-  .then(r => {
-    mostrarCheckExito(`Se registraron ${r.horas} horas ${r.minutos} minutos`);
-    limpiarSobretiempo();
-  })
-  .catch(err => {
-    mostrarToast(err.error || 'Error al registrar', 'error');
-  })
-  .finally(() => {
-    ocultarLoader();
-    btn.disabled = false;
-  });
-}
-
-
-function registrarReposicion() {
-
-  if (!empReposicion.value || !horasReposicion.value) {
-    mostrarToast('Debe seleccionar empleado y horas', 'error');
-    return;
-  }
-
-  mostrarLoader();
-
-  post({
-    action: 'reposicion',
-    idEmpleado: empReposicion.value,
-    horas: Number(horasReposicion.value),
-    justificacion: justificacionReposicion.value
-  })
-  .then(() => {
-    mostrarCheckExito(`Se han repuesto ${horasReposicion.value} horas correctamente`);
-    limpiarReposicion();
-  })
-  .catch(err => {
-    mostrarToast(err.error || 'Error al registrar reposición', 'error');
-  })
-  .finally(() => {
-    ocultarLoader();
-  });
-}
-
-
-
-function consultarSaldo() {
-
-  if (!idInterno.value) {
-    mostrarToast('Ingrese su ID', 'error');
-    return;
-  }
-
-  mostrarLoader();
-
-  post({ action:'saldo', id:idInterno.value })
-    .then(r => {
-      mostrarSaldoModal(
-        `Saldo disponible: ${r.horas} horas ${r.minutos} minutos`
-      );
-      limpiarConsulta();
-    })
-    .catch(err => {
-      mostrarToast(err.error || 'Error al consultar saldo', 'error');
-    })
-    .finally(() => {
-      ocultarLoader();
-    });
-}
-
-
-function limpiarSobretiempo() {
-  empSobretiempo.value = '';
-  fechaSobretiempo.value = '';
-  horaEntrada.value = '';
-  horaSalida.value = '';
-  justificacion.value = '';
-}
-
-function limpiarReposicion() {
-  empReposicion.value = '';
-  horasReposicion.value = '';
-  justificacionReposicion.value = '';
+function mostrarToast(txt, tipo) {
+  const t = document.getElementById('toast');
+  t.innerText = txt;
+  t.className = `toast show ${tipo}`;
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 
 function mostrarCheckExito(texto) {
   const box = document.getElementById('successBox');
   document.getElementById('successText').innerText = texto;
-
   box.style.display = 'block';
-
-  setTimeout(() => {
-    box.style.display = 'none';
-  }, 2500);
+  setTimeout(() => box.style.display = 'none', 2500);
 }
 
-function mostrarSaldoModal(texto) {
-  document.getElementById('saldoText').innerText = texto;
-  document.getElementById('saldoBox').style.display = 'block';
+// --- COMUNICACIÓN CON API ---
+
+function post(data) {
+  const form = new URLSearchParams();
+  for (let k in data) {
+    if (data[k] !== null && data[k] !== undefined) form.append(k, data[k]);
+  }
+  return fetch(API, { method: 'POST', body: form }).then(r => r.json());
 }
 
-  function cerrarSaldo() {
-  document.getElementById('saldoBox').style.display = 'none';
-}
+// --- LÓGICA DE SESIÓN (LOGIN) ---
 
-function salirApp() {
-  if (!confirm('¿Desea salir del sistema?')) return;
+function login(idManual = null) {
+  const id = idManual || document.getElementById('idInterno').value;
+  if (!id) return mostrarToast('Ingrese su ID', 'error');
 
-  // Intenta cerrar la pestaña
-  window.open('', '_self');
-  window.close();
-
-  // Fallback (si el navegador no permite cerrar)
-  setTimeout(() => {
-    document.body.innerHTML = `
-      <div style="
-        display:flex;
-        height:100vh;
-        align-items:center;
-        justify-content:center;
-        font-family:Arial;
-        color:#555;
-      ">
-        <h3>Puede cerrar esta pestaña con seguridad.</h3>
-      </div>`;
-  }, 200);
-}
-
-  function limpiarConsulta() {
-  idInterno.value = '';
-}
-
-  window.addEventListener('load', cargarEmpleados);
-
-</script>
-
-<div id="toast" class="toast"></div>
-
-<div id="loader" class="loader-overlay">
-  <div class="spinner"></div>
-  <div class="loader-text">Procesando...</div>
-</div>
-<div id="successBox" class="success-box">
-  <i class="fa-solid fa-circle-check"></i>
-  <div id="successText"></div>
-</div>
-
-  <div id="saldoBox" class="success-box" style="background:#fff7e6; display:none">
-  <i class="fa-solid fa-clock" style="color:#f1c40f"></i>
-  <div id="saldoText" style="color:#333; margin-top:10px"></div>
-  <button class="btn secondary" style="margin-top:15px" onclick="cerrarSaldo()">
-    <i class="fa-solid fa-xmark"></i> Cerrar
-  </button>
-</div>
-
-  <script>
-let usuarioLogueado = null;
-
-function login() {
-    const id = document.getElementById('idInterno').value;
-    if (!id) return mostrarToast('Ingrese su ID', 'error');
-
-    mostrarLoader();
-    post({ action: 'saldo', id: id })
+  mostrarLoader();
+  post({ action: 'saldo', id: id })
     .then(r => {
-        usuarioLogueado = r; // Guardamos los datos del empleado
-        document.getElementById('bienvenida').innerText = `¡Bienvenido, ${r.nombre}!`;
-        
-        // Formatear saldo y color de tarjeta
-        const txtSaldo = document.getElementById('txtSaldo');
-        const card = document.getElementById('cardSaldo');
-        txtSaldo.innerText = `${r.horas}h ${r.minutos}m`;
-        
-        if (r.esNegativo) {
-            card.style.background = '#fdecea';
-            card.style.color = '#b00020';
-        } else {
-            card.style.background = '#e6f7ef';
-            card.style.color = '#1b8f5a';
-        }
-
-        // Actualizar nombres en pantallas de registro
-        document.querySelectorAll('.user-name').forEach(el => el.innerText = r.nombre);
-        
-        mostrar('dashboard');
-        document.getElementById('idInterno').value = '';
+      usuarioLogueado = r;
+      // Guardar en memoria del navegador
+      localStorage.setItem('tarragona_session_id', id);
+      
+      pintarDashboard(r);
+      mostrar('dashboard');
+      document.getElementById('idInterno').value = '';
     })
-    .catch(err => mostrarToast('ID incorrecto o error de conexión', 'error'))
+    .catch(err => {
+      console.error(err);
+      mostrarToast('ID incorrecto o error de acceso', 'error');
+      localStorage.removeItem('tarragona_session_id'); // Limpiar si falló
+    })
     .finally(ocultarLoader);
 }
 
-// Modificar la función de registro para usar el ID logueado automáticamente
-function registrarSobretiempo() {
-    if (!fechaSobretiempo.value || !horaSalida.value) {
-        return mostrarToast('Complete los campos obligatorios', 'error');
-    }
-    mostrarLoader();
-    post({
-        action: 'sobretiempo',
-        idEmpleado: usuarioLogueado.id, // <--- Automático
-        fecha: fechaSobretiempo.value,
-        horaEntrada: horaEntrada.value || null,
-        horaSalida: horaSalida.value,
-        justificacion: justificacion.value
-    })
+function actualizarDatosUsuario() {
+  // Refresca el saldo sin cambiar de pantalla
+  if (!usuarioLogueado) return;
+  post({ action: 'saldo', id: usuarioLogueado.id })
     .then(r => {
-        mostrarCheckExito(`Registrado: ${r.horas}h ${r.minutos}m`);
-        login(); // Recargamos el saldo volviendo a consultar
-    })
-    .catch(err => mostrarToast('Error al registrar', 'error'))
-    .finally(ocultarLoader);
+      usuarioLogueado = r;
+      pintarDashboard(r);
+    });
+}
+
+function pintarDashboard(r) {
+  document.getElementById('bienvenida').innerText = `¡Hola, ${r.nombre}!`;
+  const txtSaldo = document.getElementById('txtSaldo');
+  const card = document.getElementById('cardSaldo');
+  
+  txtSaldo.innerText = `${r.horas}h ${r.minutos}m`;
+  
+  if (r.esNegativo) {
+    card.style.background = '#fdecea';
+    card.style.color = '#b00020';
+  } else {
+    card.style.background = '#e6f7ef';
+    card.style.color = '#1b8f5a';
+  }
+  document.querySelectorAll('.user-name').forEach(el => el.innerText = r.nombre);
 }
 
 function cerrarSesion() {
-    usuarioLogueado = null;
-    mostrar('inicio');
+  if (!confirm('¿Cerrar sesión?')) return;
+  localStorage.removeItem('tarragona_session_id');
+  usuarioLogueado = null;
+  mostrar('inicio');
 }
+
+// --- OPERACIONES ---
+
+function registrarSobretiempo() {
+  const f = document.getElementById('fechaSobretiempo').value;
+  const s = document.getElementById('horaSalida').value;
+  
+  if (!f || !s) return mostrarToast('Faltan datos obligatorios', 'error');
+
+  mostrarLoader();
+  post({
+    action: 'sobretiempo',
+    idEmpleado: usuarioLogueado.id,
+    fecha: f,
+    horaEntrada: document.getElementById('horaEntrada').value || null,
+    horaSalida: s,
+    justificacion: document.getElementById('justificacion').value
+  })
+  .then(r => {
+    mostrarCheckExito(`¡Registrado! +${r.horas}h ${r.minutos}m`);
+    limpiarFormularios();
+    actualizarDatosUsuario(); // Actualiza saldo en el dashboard
+    mostrar('dashboard');
+  })
+  .catch(e => mostrarToast('Error al procesar', 'error'))
+  .finally(ocultarLoader);
+}
+
+function registrarReposicion() {
+  const h = document.getElementById('horasReposicion').value;
+  if (!h || h <= 0) return mostrarToast('Ingrese una cantidad válida', 'error');
+
+  mostrarLoader();
+  post({
+    action: 'reposicion',
+    idEmpleado: usuarioLogueado.id,
+    horas: Number(h),
+    justificacion: document.getElementById('justificacionReposicion').value
+  })
+  .then(() => {
+    mostrarCheckExito(`Reposición de ${h}h guardada`);
+    limpiarFormularios();
+    actualizarDatosUsuario(); // Actualiza saldo en el dashboard
+    mostrar('dashboard');
+  })
+  .catch(e => mostrarToast('Error al registrar', 'error'))
+  .finally(ocultarLoader);
+}
+
+function limpiarFormularios() {
+  document.querySelectorAll('input, textarea').forEach(i => {
+    if(i.id !== 'idInterno') i.value = '';
+  });
+}
+
+// --- INICIO AUTOMÁTICO AL CARGAR ---
+
+window.addEventListener('load', () => {
+  const sesionGuardada = localStorage.getItem('tarragona_session_id');
+  if (sesionGuardada) {
+    login(sesionGuardada);
+  }
+});
   </script>
   
 </body>
 </html>
+
