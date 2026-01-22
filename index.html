@@ -186,105 +186,57 @@ input:focus, select:focus, textarea:focus {
 <body>
 
 <div id="inicio" class="container pantalla activa" style="display:block">
- <img src="assets/logo.png" alt="Logo empresa" style="max-width:160px;margin-bottom:15px">
-  <h2>Sistema de Personal Tarragona</h2>
-  <h4>Bienvenido al sistema de personal Tarragona, por favor seleccione una opción</h4>
-  <button class="btn" onclick="mostrar('sobretiempo')">
-  <i class="fa-solid fa-clock"></i> Registrar Sobretiempo
-</button>
+    <img src="assets/logo.png" alt="Logo" style="max-width:160px;margin-bottom:15px">
+    <h2>Acceso al Sistema</h2>
+    <p>Ingrese su ID Interno para continuar</p>
+    <input type="password" id="idInterno" placeholder="Contraseña ID" style="text-align:center; font-size:1.2em">
+    <button class="btn" onclick="login()">
+        <i class="fa-solid fa-right-to-bracket"></i> Ingresar
+    </button>
+</div>
 
-<button class="btn" onclick="mostrar('reposicion')">
-  <i class="fa-solid fa-rotate-left"></i> Reposición de Tiempo
-</button>
+<div id="dashboard" class="container pantalla">
+    <h3 id="bienvenida">¡Hola!</h3>
+    <div id="cardSaldo" style="padding:20px; border-radius:12px; margin:20px 0;">
+        <div style="font-size:0.9em; opacity:0.8">Tu saldo disponible es:</div>
+        <div id="txtSaldo" style="font-size:2em; font-weight:bold;">0h 00m</div>
+    </div>
 
-<button class="btn" onclick="mostrar('consulta')">
-  <i class="fa-solid fa-magnifying-glass"></i> Consultar Saldo
-</button>
-
-  <button class="btn secondary" onclick="salirApp()">
-  <i class="fa-solid fa-right-from-bracket"></i> Salir
-</button>
-
-
+    <button class="btn" onclick="mostrar('sobretiempo')">
+        <i class="fa-solid fa-clock"></i> Registrar Sobretiempo
+    </button>
+    <button class="btn" onclick="mostrar('reposicion')">
+        <i class="fa-solid fa-rotate-left"></i> Registrar Reposición
+    </button>
+    <button class="btn secondary" onclick="cerrarSesion()">
+        <i class="fa-solid fa-power-off"></i> Salir
+    </button>
 </div>
 
 <div id="sobretiempo" class="container pantalla">
-  <h3>
-  <i class="fa-solid fa-clock"></i>
-  Registro de Sobretiempo
-</h3>
-
-
-  <label>Nombre del empleado</label>
-  <select id="empSobretiempo"></select>
-  <label>Fecha</label>
-  <input type="date" id="fechaSobretiempo">
-  <label>Hora de inicio <small>(solo aplica fin de semana)</small></label>
-  <input type="time" id="horaEntrada">
-  <label>Hora de salida</label>
-  <input type="time" id="horaSalida">
-  <label>Justificación</label>
-  <textarea id="justificacion"></textarea>
-  <button class="btn" id="btnSobretiempo" onclick="registrarSobretiempo()">
-  <i class="fa-solid fa-floppy-disk"></i> Registrar
-</button>
-<button class="btn secondary" onclick="limpiarSobretiempo()">
-  <i class="fa-solid fa-broom"></i> Limpiar
-</button>
-
-  <div id="msgSobretiempo" class="msg"></div>
-  <button class="btn secondary" onclick="volver()">Volver</button>
+    <h3>Registrar Sobretiempo</h3>
+    <p>Empleado: <strong class="user-name"></strong></p>
+    <label>Fecha</label>
+    <input type="date" id="fechaSobretiempo">
+    <label>Hora Inicio <small>(Fin de semana)</small></label>
+    <input type="time" id="horaEntrada">
+    <label>Hora Salida</label>
+    <input type="time" id="horaSalida">
+    <label>Justificación</label>
+    <textarea id="justificacion"></textarea>
+    <button class="btn" onclick="registrarSobretiempo()">Guardar</button>
+    <button class="btn secondary" onclick="mostrar('dashboard')">Volver</button>
 </div>
 
 <div id="reposicion" class="container pantalla">
-<h3>
-  <i class="fa-solid fa-rotate-left"></i>
-  Reposición de Tiempo
-</h3>
-
-
-  <label>Nombre del empleado</label>
-  <select id="empReposicion"></select>
-  <label>Horas a reponer (Ingresar solo numeros enteros)</label>
-  <input type="number" id="horasReposicion">
-  <label>Justificación</label>
-  <textarea id="justificacionReposicion"></textarea>
-  <button class="btn" onclick="registrarReposicion()">
-  <i class="fa-solid fa-floppy-disk"></i> Registrar
-</button>
-<button class="btn secondary" onclick="limpiarReposicion()">
-  <i class="fa-solid fa-broom"></i> Limpiar
-</button>
-
-  <div id="msgReposicion" class="msg"></div>
-    <button class="btn secondary" onclick="volver()">
-  <i class="fa-solid fa-arrow-left"></i> Volver
-</button>
-
-</div>
-
-<div id="consulta" class="container pantalla">
-<h3>
-  <i class="fa-solid fa-magnifying-glass"></i>
-  Consulta de Tiempo Disponible
-</h3>
-
-
-  <label>Ingrese su ID</label>
-  <input type="password" id="idInterno">
-  <button class="btn" onclick="consultarSaldo()">
-  <i class="fa-solid fa-floppy-disk"></i> Consultar
-</button>
-<button class="btn secondary" onclick="limpiarConsulta()">
-  <i class="fa-solid fa-broom"></i> Limpiar
-</button>
-
-  
-  <div id="resultadoSaldo" class="msg"></div>
-  <button class="btn secondary" onclick="volver()">
-  <i class="fa-solid fa-arrow-left"></i> Volver
-</button>
-
+    <h3>Registrar Reposición</h3>
+    <p>Empleado: <strong class="user-name"></strong></p>
+    <label>Horas a reponer</label>
+    <input type="number" id="horasReposicion" placeholder="Ej: 2">
+    <label>Justificación</label>
+    <textarea id="justificacionReposicion"></textarea>
+    <button class="btn" onclick="registrarReposicion()">Guardar</button>
+    <button class="btn secondary" onclick="mostrar('dashboard')">Volver</button>
 </div>
 
 <script>
@@ -512,10 +464,71 @@ function salirApp() {
     <i class="fa-solid fa-xmark"></i> Cerrar
   </button>
 </div>
+let usuarioLogueado = null;
 
+function login() {
+    const id = document.getElementById('idInterno').value;
+    if (!id) return mostrarToast('Ingrese su ID', 'error');
+
+    mostrarLoader();
+    post({ action: 'saldo', id: id })
+    .then(r => {
+        usuarioLogueado = r; // Guardamos los datos del empleado
+        document.getElementById('bienvenida').innerText = `¡Bienvenido, ${r.nombre}!`;
+        
+        // Formatear saldo y color de tarjeta
+        const txtSaldo = document.getElementById('txtSaldo');
+        const card = document.getElementById('cardSaldo');
+        txtSaldo.innerText = `${r.horas}h ${r.minutos}m`;
+        
+        if (r.esNegativo) {
+            card.style.background = '#fdecea';
+            card.style.color = '#b00020';
+        } else {
+            card.style.background = '#e6f7ef';
+            card.style.color = '#1b8f5a';
+        }
+
+        // Actualizar nombres en pantallas de registro
+        document.querySelectorAll('.user-name').forEach(el => el.innerText = r.nombre);
+        
+        mostrar('dashboard');
+        document.getElementById('idInterno').value = '';
+    })
+    .catch(err => mostrarToast('ID incorrecto o error de conexión', 'error'))
+    .finally(ocultarLoader);
+}
+
+// Modificar la función de registro para usar el ID logueado automáticamente
+function registrarSobretiempo() {
+    if (!fechaSobretiempo.value || !horaSalida.value) {
+        return mostrarToast('Complete los campos obligatorios', 'error');
+    }
+    mostrarLoader();
+    post({
+        action: 'sobretiempo',
+        idEmpleado: usuarioLogueado.id, // <--- Automático
+        fecha: fechaSobretiempo.value,
+        horaEntrada: horaEntrada.value || null,
+        horaSalida: horaSalida.value,
+        justificacion: justificacion.value
+    })
+    .then(r => {
+        mostrarCheckExito(`Registrado: ${r.horas}h ${r.minutos}m`);
+        login(); // Recargamos el saldo volviendo a consultar
+    })
+    .catch(err => mostrarToast('Error al registrar', 'error'))
+    .finally(ocultarLoader);
+}
+
+function cerrarSesion() {
+    usuarioLogueado = null;
+    mostrar('inicio');
+}
   
 </body>
 </html>
+
 
 
 
