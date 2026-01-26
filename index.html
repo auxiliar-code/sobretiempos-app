@@ -3,245 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema de Personal Tarragona</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <style>
-    body { font-family: Arial; background:#f0f2f5; margin:0 }
+    :root {
+      --primary: #1b8f5a;
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --text: #333;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; color: var(--text); }
     
     .container {
-      max-width:550px; margin:40px auto; padding:25px;
-      border-radius:12px; background:#f4f4f9;
-      box-shadow:0 6px 15px rgba(0,0,0,.1);
-      text-align:center;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 16px;
+      background: var(--card);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      text-align: center;
     }
 
-    .btn {
-      background:#1b8f5a; color:#fff; border:none;
-      border-radius:6px; padding:10px; width:100%;
-      margin-top:12px;
-      transition: all .2s ease;
-    }
-    
-    .btn:hover {
-      filter: brightness(1.1);
-      cursor: pointer;
-      transform: translateY(-1px);
-    }
-    
-    .btn.secondary { background:#ccc; color:#333 }
-    
-    .msg { margin-top:15px; padding:10px; border-radius:6px }
-    .ok { background:#e6f7ef; color:#1b8f5a }
-    .error { background:#fdecea; color:#b00020 }
-    
-    input, select, textarea { 
-      width:100%; padding:8px; margin-top:6px;
-      border-radius: 6px; border: 1px solid #ccc;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      border-color: #1b8f5a; outline: none;
-      box-shadow: 0 0 0 2px rgba(27,143,90,.15);
-    }
-
-    /* --- ESTILOS DE PANTALLA UNIFICADOS --- */
+    /* --- ESTILOS DE PANTALLA (Animaciones) --- */
     .pantalla {
-      display: none; /* Regla base para ocultar */
+      display: none;
       opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
 
     .pantalla.activa {
-      display: block; /* Se muestra cuando tiene esta clase */
+      display: block;
     }
 
     .pantalla.visible {
-      opacity: 1;     /* Se anima cuando tiene esta clase */
+      opacity: 1;
       transform: translateY(0);
     }
-    /* ------------------------------------- */
 
-    label {
-      display:block; text-align:left; font-weight:600;
-      margin-top:14px; margin-bottom:4px; color:#333;
+    /* --- FORMULARIOS Y BOTONES --- */
+    h2 { color: var(--primary); margin-bottom: 5px; }
+    h3 { color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 10px; }
+    h4 { color: #666; font-weight: normal; margin-top: 5px; margin-bottom: 25px; }
+
+    label { display: block; text-align: left; font-weight: 600; margin-top: 15px; margin-bottom: 5px; color: #444; }
+    label small { font-weight: normal; color: #888; }
+
+    input, select, textarea { 
+      width: 100%; padding: 12px; margin-top: 5px;
+      border-radius: 8px; border: 1px solid #ddd;
+      font-size: 14px; box-sizing: border-box;
+      transition: border-color 0.3s;
     }
-    label small { font-weight: normal; color:#666; }
-
-    .toast {
-      position: fixed; top: 20px; right: 20px;
-      min-width: 260px; max-width: 320px;
-      padding: 14px 18px; border-radius: 10px;
-      color: #333; font-weight: 600;
-      box-shadow: 0 10px 25px rgba(0,0,0,.15);
-      opacity: 0; transform: translateY(-10px);
-      transition: all .35s ease; z-index: 9999;
+    
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary); outline: none;
+      box-shadow: 0 0 0 3px rgba(27,143,90,0.1);
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { background: #e6f7ef; border-left: 6px solid #1b8f5a; }
-    .toast.error { background: #fdecea; border-left: 6px solid #b00020; }
 
-    .container h3 { margin-bottom: 20px; color: #1b8f5a; }
+    .btn {
+      background: var(--primary); color: #fff; border: none;
+      border-radius: 8px; padding: 12px; width: 100%;
+      margin-top: 20px; font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    
+    .btn:hover { filter: brightness(1.05); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(27,143,90,0.3); }
+    .btn:active { transform: translateY(0); }
+    
+    .btn.secondary { background: #e4e6eb; color: #333; margin-top: 10px; }
+    .btn.secondary:hover { background: #d8dadf; box-shadow: none; }
 
+    .menu-grid { display: grid; gap: 15px; margin-top: 20px; }
+    
+    /* --- LOADER --- */
     .loader-overlay {
-      position: fixed; inset: 0;
-      background: rgba(255,255,255,.85);
-      display: none; /* Loader oculto por defecto */
-      flex-direction: column; justify-content: center; align-items: center;
-      z-index: 10000;
+      position: fixed; inset: 0; background: rgba(255,255,255,0.9);
+      display: none; flex-direction: column; justify-content: center; align-items: center;
+      z-index: 10000; backdrop-filter: blur(2px);
     }
     .spinner {
-      width: 60px; height: 60px;
-      border: 6px solid #e0e0e0; border-top: 6px solid #1b8f5a;
+      width: 50px; height: 50px;
+      border: 5px solid #e0e0e0; border-top: 5px solid var(--primary);
       border-radius: 50%; animation: spin 1s linear infinite;
     }
-    .loader-text { margin-top: 15px; font-weight: 600; color: #1b8f5a; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .success-box {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, -50%) scale(.8);
-      background: #e6f7ef; padding: 30px 40px;
-      border-radius: 16px; text-align: center;
-      box-shadow: 0 15px 30px rgba(0,0,0,.2);
-      display: none; z-index: 10001;
-      animation: successIn .4s ease forwards;
-    }
-    .success-box i { font-size: 48px; color: #1b8f5a; }
-    .success-box div { margin-top: 10px; font-weight: 600; color: #1b8f5a; }
-    @keyframes successIn { to { transform: translate(-50%, -50%) scale(1); } }
   </style>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 
 <body>
 
-  <div id="inicio" class="container pantalla activa visible" style="display:block">
-    <img src="assets/logo.png" alt="Logo empresa" style="max-width:160px;margin-bottom:15px">
-    <h2>Sistema de Personal Tarragona</h2>
-    <h4>Bienvenido al sistema de personal Tarragona, por favor seleccione una opción</h4>
+  <div id="login" class="container pantalla activa visible" style="display:block">
+    <img src="https://www.tarragonaceramicas.com/wp-content/uploads/2021/06/logo-tarragona.png" alt="Logo" style="max-width:180px; margin-bottom:20px">
+    <h2>Bienvenido</h2>
+    <h4>Ingrese su ID para acceder al sistema</h4>
     
-    <button class="btn" onclick="mostrar('sobretiempo')">
-      <i class="fa-solid fa-clock"></i> Registrar Sobretiempo
-    </button>
-    <button class="btn" onclick="mostrar('reposicion')">
-      <i class="fa-solid fa-rotate-left"></i> Reposición de Tiempo
-    </button>
-    <button class="btn" onclick="mostrar('consulta')">
-      <i class="fa-solid fa-magnifying-glass"></i> Consultar Saldo
-    </button>
-    <button class="btn secondary" onclick="salirApp()">
-      <i class="fa-solid fa-right-from-bracket"></i> Salir
+    <div style="text-align:left">
+      <label>ID de Usuario</label>
+      <input type="password" id="loginId" placeholder="Ej. 12345">
+    </div>
+
+    <button class="btn" onclick="iniciarSesion()">
+      <i class="fa-solid fa-right-to-bracket"></i> Ingresar
     </button>
   </div>
 
+  <div id="menu" class="container pantalla" style="display:none">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+        <img src="https://www.tarragonaceramicas.com/wp-content/uploads/2021/06/logo-tarragona.png" alt="Logo" style="max-width:120px;">
+        <div style="font-size:12px; color:#666">Hola, <b id="userDisplay">Usuario</b></div>
+    </div>
+    
+    <h3>Menú Principal</h3>
+    
+    <div class="menu-grid">
+      <button class="btn" onclick="mostrar('sobretiempo')">
+        <i class="fa-solid fa-clock"></i> Registrar Sobretiempo
+      </button>
+      <button class="btn" onclick="mostrar('reposicion')">
+        <i class="fa-solid fa-rotate-left"></i> Reposición de Tiempo
+      </button>
+      <button class="btn" onclick="mostrar('consulta')">
+        <i class="fa-solid fa-magnifying-glass"></i> Consultar Mi Saldo
+      </button>
+      <button class="btn secondary" onclick="cerrarSesion()">
+        <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
   <div id="sobretiempo" class="container pantalla" style="display:none">
-    <h3><i class="fa-solid fa-clock"></i> Registro de Sobretiempo</h3>
-    <label>Nombre del empleado</label>
+    <h3><i class="fa-solid fa-clock"></i> Registrar Sobretiempo</h3>
+    
+    <label>Empleado</label>
     <select id="empSobretiempo"></select>
+    
     <label>Fecha</label>
     <input type="date" id="fechaSobretiempo">
-    <label>Hora de inicio <small>(solo aplica fin de semana)</small></label>
-    <input type="time" id="horaEntrada">
-    <label>Hora de salida</label>
-    <input type="time" id="horaSalida">
-    <label>Justificación</label>
-    <textarea id="justificacion"></textarea>
     
-    <button class="btn" id="btnSobretiempo" onclick="registrarSobretiempo()">
-      <i class="fa-solid fa-floppy-disk"></i> Registrar
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+      <div>
+        <label>Inicio <small>(Fin de semana)</small></label>
+        <input type="time" id="horaEntrada">
+      </div>
+      <div>
+        <label>Salida</label>
+        <input type="time" id="horaSalida">
+      </div>
+    </div>
+
+    <label>Justificación</label>
+    <textarea id="justificacion" rows="2"></textarea>
+    
+    <button class="btn" onclick="registrarSobretiempo()">
+      <i class="fa-solid fa-floppy-disk"></i> Guardar Registro
     </button>
-    <button class="btn secondary" onclick="limpiarSobretiempo()">
-      <i class="fa-solid fa-broom"></i> Limpiar
+    
+    <button class="btn secondary" onclick="volverMenu()">
+      <i class="fa-solid fa-arrow-left"></i> Volver
     </button>
-    <div id="msgSobretiempo" class="msg"></div>
-    <button class="btn secondary" onclick="volver()">Volver</button>
   </div>
 
   <div id="reposicion" class="container pantalla" style="display:none">
     <h3><i class="fa-solid fa-rotate-left"></i> Reposición de Tiempo</h3>
-    <label>Nombre del empleado</label>
+    
+    <label>Empleado</label>
     <select id="empReposicion"></select>
-    <label>Horas a reponer (Ingresar solo numeros enteros)</label>
-    <input type="number" id="horasReposicion">
+    
+    <label>Horas a reponer</label>
+    <input type="number" id="horasReposicion" placeholder="Solo números enteros">
+    
     <label>Justificación</label>
-    <textarea id="justificacionReposicion"></textarea>
+    <textarea id="justificacionReposicion" rows="2"></textarea>
     
     <button class="btn" onclick="registrarReposicion()">
-      <i class="fa-solid fa-floppy-disk"></i> Registrar
+      <i class="fa-solid fa-floppy-disk"></i> Registrar Reposición
     </button>
-    <button class="btn secondary" onclick="limpiarReposicion()">
-      <i class="fa-solid fa-broom"></i> Limpiar
-    </button>
-    <div id="msgReposicion" class="msg"></div>
-    <button class="btn secondary" onclick="volver()">
+    
+    <button class="btn secondary" onclick="volverMenu()">
       <i class="fa-solid fa-arrow-left"></i> Volver
     </button>
   </div>
 
   <div id="consulta" class="container pantalla" style="display:none">
-    <h3><i class="fa-solid fa-magnifying-glass"></i> Consulta de Tiempo Disponible</h3>
-    <label>Ingrese su ID</label>
-    <input type="password" id="idInterno">
+    <h3><i class="fa-solid fa-magnifying-glass"></i> Consultar Saldo</h3>
+    <p style="color:#666; font-size:14px">Consulte las horas disponibles del ID actual.</p>
+
+    <label>ID Usuario</label>
+    <input type="text" id="idConsulta" readonly style="background:#eee">
     
     <button class="btn" onclick="consultarSaldo()">
-      <i class="fa-solid fa-floppy-disk"></i> Consultar
+      <i class="fa-solid fa-search"></i> Consultar Ahora
     </button>
-    <button class="btn secondary" onclick="limpiarConsulta()">
-      <i class="fa-solid fa-broom"></i> Limpiar
-    </button>
-    <div id="resultadoSaldo" class="msg"></div>
-    <button class="btn secondary" onclick="volver()">
+    
+    <button class="btn secondary" onclick="volverMenu()">
       <i class="fa-solid fa-arrow-left"></i> Volver
     </button>
   </div>
 
-  <div id="toast" class="toast"></div>
-
   <div id="loader" class="loader-overlay">
     <div class="spinner"></div>
-    <div class="loader-text">Procesando...</div>
-  </div>
-
-  <div id="successBox" class="success-box">
-    <i class="fa-solid fa-circle-check"></i>
-    <div id="successText"></div>
-  </div>
-
-  <div id="saldoBox" class="success-box" style="background:#fff7e6; display:none">
-    <i class="fa-solid fa-clock" style="color:#f1c40f"></i>
-    <div id="saldoText" style="color:#333; margin-top:10px"></div>
-    <button class="btn secondary" style="margin-top:15px" onclick="cerrarSaldo()">
-      <i class="fa-solid fa-xmark"></i> Cerrar
-    </button>
+    <div style="margin-top:15px; font-weight:600; color:#1b8f5a">Procesando...</div>
   </div>
 
   <script>
     const API = 'https://script.google.com/macros/s/AKfycbx5IRdG-I0Ykq3U0VzvXqUKE0DUSth_M2qi0Bw5ZOwaGttUqZ96XQQcsDkp2RVgx-J8/exec';
-
-    function mostrarLoader() { document.getElementById('loader').style.display = 'flex'; }
-    function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
     
+    // --- LÓGICA DE NAVEGACIÓN ---
     function mostrar(id) {
-      // 1. Ocultar todas
       document.querySelectorAll('.pantalla').forEach(p => {
-        p.classList.remove('activa');
-        p.classList.remove('visible');
-        p.style.display = 'none'; // Asegura ocultar
+        p.classList.remove('activa', 'visible');
+        p.style.display = 'none';
       });
 
-      // 2. Mostrar destino
       const pantalla = document.getElementById(id);
       pantalla.style.display = 'block';
       pantalla.classList.add('activa');
-
-      // 3. Pequeño retraso para animación
-      setTimeout(() => {
-        pantalla.classList.add('visible');
-      }, 10);
+      setTimeout(() => pantalla.classList.add('visible'), 10);
     }
 
-    function volver() { mostrar('inicio'); }
+    function volverMenu() { mostrar('menu'); }
 
+    function mostrarLoader() { document.getElementById('loader').style.display = 'flex'; }
+    function ocultarLoader() { document.getElementById('loader').style.display = 'none'; }
+
+    // --- COMUNICACIÓN CON GOOGLE SCRIPT ---
     function post(data) {
       const form = new URLSearchParams();
       for (let k in data) {
@@ -250,7 +242,49 @@
       return fetch(API, { method: 'POST', body: form }).then(r => r.json());
     }
 
+    // --- FUNCIONES DE NEGOCIO ---
+
+    // 1. LOGIN (Usamos la función de saldo para validar si existe el usuario)
+    function iniciarSesion() {
+      const id = document.getElementById('loginId').value;
+      if(!id) {
+        Swal.fire({icon: 'warning', title: 'Atención', text: 'Por favor ingrese su ID'});
+        return;
+      }
+
+      mostrarLoader();
+      
+      // Reutilizamos la acción 'saldo' para verificar si el usuario existe
+      post({ action: 'saldo', id: id })
+        .then(r => {
+          if(r.error) throw new Error(r.error);
+          
+          // Login Exitoso
+          document.getElementById('userDisplay').innerText = r.nombre;
+          document.getElementById('idConsulta').value = r.id; // Pre-llenar consulta
+          
+          mostrar('menu');
+          cargarEmpleados(); // Cargamos la lista para los formularios
+        })
+        .catch(err => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Acceso Denegado',
+            text: 'El ID ingresado no fue encontrado en el sistema.'
+          });
+        })
+        .finally(() => ocultarLoader());
+    }
+
+    function cerrarSesion() {
+      document.getElementById('loginId').value = '';
+      mostrar('login');
+    }
+
     function cargarEmpleados(){
+      // Solo cargamos si los selects están vacíos
+      if(document.getElementById('empSobretiempo').options.length > 1) return;
+
       post({action:'empleados'}).then(emps=>{
         const s1 = document.getElementById('empSobretiempo');
         const s2 = document.getElementById('empReposicion');
@@ -262,6 +296,7 @@
       });
     }
 
+    // 2. REGISTRAR SOBRETIEMPO
     function registrarSobretiempo() {
       const emp = document.getElementById('empSobretiempo').value;
       const fecha = document.getElementById('fechaSobretiempo').value;
@@ -270,31 +305,43 @@
       const just = document.getElementById('justificacion').value;
 
       if (!emp || !fecha || !salida) {
-        mostrarToast('Complete todos los campos obligatorios', 'error'); return;
+        Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Complete empleado, fecha y hora de salida.' });
+        return;
       }
 
-      const btn = document.getElementById('btnSobretiempo');
-      btn.disabled = true; mostrarLoader();
+      mostrarLoader();
 
       post({
         action: 'sobretiempo', idEmpleado: emp, fecha: fecha,
         horaEntrada: entrada || null, horaSalida: salida, justificacion: just
       })
       .then(r => {
-        mostrarCheckExito(`Se registraron ${r.horas} horas ${r.minutos} minutos`);
-        limpiarSobretiempo();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Guardado!',
+          text: `Se registraron ${r.horas}h ${r.minutos}m correctamente.`
+        });
+        // Limpiar campos
+        document.getElementById('fechaSobretiempo').value = '';
+        document.getElementById('horaEntrada').value = '';
+        document.getElementById('horaSalida').value = '';
+        document.getElementById('justificacion').value = '';
       })
-      .catch(err => { mostrarToast(err.error || 'Error al registrar', 'error'); })
-      .finally(() => { ocultarLoader(); btn.disabled = false; });
+      .catch(err => {
+        Swal.fire({ icon: 'error', title: 'Error', text: err.error || 'No se pudo registrar.' });
+      })
+      .finally(() => ocultarLoader());
     }
 
+    // 3. REGISTRAR REPOSICIÓN
     function registrarReposicion() {
       const emp = document.getElementById('empReposicion').value;
       const horas = document.getElementById('horasReposicion').value;
       const just = document.getElementById('justificacionReposicion').value;
 
       if (!emp || !horas) {
-        mostrarToast('Debe seleccionar empleado y horas', 'error'); return;
+        Swal.fire({ icon: 'warning', title: 'Faltan datos', text: 'Seleccione empleado y horas.' });
+        return;
       }
       mostrarLoader();
 
@@ -302,77 +349,52 @@
         action: 'reposicion', idEmpleado: emp, horas: Number(horas), justificacion: just
       })
       .then(() => {
-        mostrarCheckExito(`Se han repuesto ${horas} horas correctamente`);
-        limpiarReposicion();
+        Swal.fire({
+          icon: 'success',
+          title: '¡Guardado!',
+          text: `Se han descontado ${horas} horas correctamente.`
+        });
+        document.getElementById('horasReposicion').value = '';
+        document.getElementById('justificacionReposicion').value = '';
       })
-      .catch(err => { mostrarToast(err.error || 'Error al registrar reposición', 'error'); })
-      .finally(() => { ocultarLoader(); });
+      .catch(err => {
+        Swal.fire({ icon: 'error', title: 'Error', text: err.error || 'Error al procesar.' });
+      })
+      .finally(() => ocultarLoader());
     }
 
+    // 4. CONSULTAR SALDO
     function consultarSaldo() {
-      const id = document.getElementById('idInterno').value;
-      if (!id) { mostrarToast('Ingrese su ID', 'error'); return; }
+      const id = document.getElementById('idConsulta').value;
+      if (!id) return; // No debería pasar porque es readonly
+
       mostrarLoader();
 
       post({ action:'saldo', id:id })
         .then(r => {
-          mostrarSaldoModal(`Saldo disponible: ${r.horas} horas ${r.minutos} minutos`);
-          limpiarConsulta();
+          Swal.fire({
+            icon: 'info',
+            title: 'Saldo Disponible',
+            html: `<div style="font-size:1.2em; font-weight:bold; color:#1b8f5a">${r.horas} horas y ${r.minutos} minutos</div>`
+          });
         })
-        .catch(err => { mostrarToast(err.error || 'Error al consultar saldo', 'error'); })
-        .finally(() => { ocultarLoader(); });
+        .catch(err => {
+          Swal.fire({ icon: 'error', title: 'Error', text: err.error });
+        })
+        .finally(() => ocultarLoader());
     }
 
-    function limpiarSobretiempo() {
-      document.getElementById('empSobretiempo').value = '';
-      document.getElementById('fechaSobretiempo').value = '';
-      document.getElementById('horaEntrada').value = '';
-      document.getElementById('horaSalida').value = '';
-      document.getElementById('justificacion').value = '';
-    }
-
-    function limpiarReposicion() {
-      document.getElementById('empReposicion').value = '';
-      document.getElementById('horasReposicion').value = '';
-      document.getElementById('justificacionReposicion').value = '';
-    }
-    
-    function limpiarConsulta() { document.getElementById('idInterno').value = ''; }
-
-    function mostrarCheckExito(texto) {
-      const box = document.getElementById('successBox');
-      document.getElementById('successText').innerText = texto;
-      box.style.display = 'block';
-      setTimeout(() => { box.style.display = 'none'; }, 2500);
-    }
-
-    function mostrarSaldoModal(texto) {
-      document.getElementById('saldoText').innerText = texto;
-      document.getElementById('saldoBox').style.display = 'block';
-    }
-    function cerrarSaldo() { document.getElementById('saldoBox').style.display = 'none'; }
-
-    function salirApp() {
-      if (!confirm('¿Desea salir del sistema?')) return;
-      window.open('', '_self'); window.close();
-      setTimeout(() => {
-        document.body.innerHTML = '<div style="display:flex;height:100vh;align-items:center;justify-content:center;font-family:Arial;color:#555;"><h3>Puede cerrar esta pestaña con seguridad.</h3></div>';
-      }, 200);
-    }
-
-    function mostrarToast(texto, tipo = 'success') {
-      const toast = document.getElementById('toast');
-      toast.className = `toast show ${tipo}`;
-      toast.innerText = texto;
-      setTimeout(() => { toast.className = 'toast'; }, 3000);
-    }
-
-    // Inicialización segura
+    // Inicialización
     document.addEventListener('DOMContentLoaded', function() {
-      cargarEmpleados();
-      // Forzamos "mostrar inicio" para asegurar que el JS tome control
-      mostrar('inicio'); 
+      // Nos aseguramos de empezar en el LOGIN
+      mostrar('login');
+      
+      // Permitir login con Enter
+      document.getElementById('loginId').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') iniciarSesion();
+      });
     });
+
   </script>
 </body>
 </html>
