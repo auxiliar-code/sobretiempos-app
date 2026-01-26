@@ -26,16 +26,25 @@
     .error { background:#fdecea; color:#b00020 }
     input, select, textarea { width:100%; padding:8px; margin-top:6px }
 
-    .pantalla {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .3s ease, transform .3s ease;
+    /* Reemplaza tus estilos de .pantalla con esto: */
+
+.pantalla {
+  display: none; /* Esto es vital para que no se vean */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .pantalla.activa {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
+  display: block; /* Solo la activa se muestra en bloque */
+  /* La opacidad se maneja con un pequeño retraso en JS, 
+     pero display:block debe ser inmediato */
+}
+
+/* Agrega esta clase auxiliar para la animación visual */
+.pantalla.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
   
 label {
@@ -298,17 +307,26 @@ function ocultarLoader() {
 }
   
 function mostrar(id) {
-  document.querySelectorAll('.pantalla').forEach(p => {
-    p.classList.remove('activa');
-    p.style.display = 'none';
-  });
+  // 1. Ocultamos TODAS las pantallas
+  document.querySelectorAll('.pantalla').forEach(p => {
+    p.classList.remove('activa');
+    p.classList.remove('visible'); // Quitamos la clase de animación
+    p.style.display = 'none'; // Forzamos ocultar a nivel de estilo
+  });
 
-  const pantalla = document.getElementById(id);
-  pantalla.style.display = 'block';
+  // 2. Seleccionamos la pantalla destino
+  const pantalla = document.getElementById(id);
+  
+  // 3. La hacemos visible en estructura (pero transparente aún)
+  pantalla.style.display = 'block';
+  pantalla.classList.add('activa');
 
-  setTimeout(() => pantalla.classList.add('activa'), 10);
+  // 4. Pequeño retraso para permitir que el navegador procese el display:block
+  // antes de activar la transición de opacidad
+  setTimeout(() => {
+    pantalla.classList.add('visible');
+  }, 10);
 }
-
 function volver() {
   mostrar('inicio');
 }
@@ -490,7 +508,10 @@ function salirApp() {
   idInterno.value = '';
 }
 
-  window.addEventListener('load', cargarEmpleados);
+  window.addEventListener('load', function() {
+  cargarEmpleados(); // Tu función original
+  mostrar('inicio'); // <--- ESTO ES LO NUEVO: Fuerza el orden visual
+});
 </script>
 
    <script>
@@ -527,4 +548,5 @@ function mostrarToast(texto, tipo = 'success') {
   
 </body>
 </html>
+
 
