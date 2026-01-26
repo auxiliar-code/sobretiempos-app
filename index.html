@@ -1,415 +1,518 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="robots" content="noindex, nofollow">
-  <meta name="googlebot" content="noindex, nofollow">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    body { font-family: Arial; background:#f0f2f5; margin:0 }
-    .container {
-      max-width:550px; margin:40px auto; padding:25px;
-      border-radius:12px; background:#f4f4f9;
-      box-shadow:0 6px 15px rgba(0,0,0,.1);
-      text-align:center;
-    }
-    .btn {
-      background:#1b8f5a; color:#fff; border:none;
-      border-radius:6px; padding:10px; width:100%;
-      margin-top:12px;
-    }
-    .btn.secondary { background:#ccc; color:#333 }
-    .pantalla { display:none }
-    .msg { margin-top:15px; padding:10px; border-radius:6px }
-    .ok { background:#e6f7ef; color:#1b8f5a }
-    .error { background:#fdecea; color:#b00020 }
-    input, select, textarea { width:100%; padding:8px; margin-top:6px }
+  <style>
+    body { font-family: Arial; background:#f0f2f5; margin:0 }
+    .container {
+      max-width:550px; margin:40px auto; padding:25px;
+      border-radius:12px; background:#f4f4f9;
+      box-shadow:0 6px 15px rgba(0,0,0,.1);
+      text-align:center;
+    }
+    .btn {
+      background:#1b8f5a; color:#fff; border:none;
+      border-radius:6px; padding:10px; width:100%;
+      margin-top:12px;
+    }
+    .btn.secondary { background:#ccc; color:#333 }
+    .pantalla { display:none }
+    .msg { margin-top:15px; padding:10px; border-radius:6px }
+    .ok { background:#e6f7ef; color:#1b8f5a }
+    .error { background:#fdecea; color:#b00020 }
+    input, select, textarea { width:100%; padding:8px; margin-top:6px }
 
-    .pantalla {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity .3s ease, transform .3s ease;
+    .pantalla {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s ease, transform .3s ease;
 }
 
 .pantalla.activa {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
 }
-  
+  
 label {
-  display:block;
-  text-align:left;
-  font-weight:600;
-  margin-top:14px;
-  margin-bottom:4px;
-  color:#333;
+  display:block;
+  text-align:left;
+  font-weight:600;
+  margin-top:14px;
+  margin-bottom:4px;
+  color:#333;
 }
 
 label small {
-  font-weight: normal;
-  color:#666;
+  font-weight: normal;
+  color:#666;
 }
 
 .toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  min-width: 260px;
-  max-width: 320px;
-  padding: 14px 18px;
-  border-radius: 10px;
-  color: #333;
-  font-weight: 600;
-  box-shadow: 0 10px 25px rgba(0,0,0,.15);
-  opacity: 0;
-  transform: translateY(-10px);
-  transition: all .35s ease;
-  z-index: 9999;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  min-width: 260px;
+  max-width: 320px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  color: #333;
+  font-weight: 600;
+  box-shadow: 0 10px 25px rgba(0,0,0,.15);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all .35s ease;
+  z-index: 9999;
 }
 
 .toast.show {
-  opacity: 1;
-  transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .toast.success {
-  background: #e6f7ef;
-  border-left: 6px solid #1b8f5a;
+  background: #e6f7ef;
+  border-left: 6px solid #1b8f5a;
 }
 
 .toast.error {
-  background: #fdecea;
-  border-left: 6px solid #b00020;
+  background: #fdecea;
+  border-left: 6px solid #b00020;
 }
 
 .toast.warning {
-  background: #fff7e6;
-  border-left: 6px solid #f1c40f;
+  background: #fff7e6;
+  border-left: 6px solid #f1c40f;
 }
 
-    .btn:hover {
-  filter: brightness(1.1);
-  cursor: pointer;
-  transform: translateY(-1px);
+    .btn:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+  transform: translateY(-1px);
 }
 
 .btn {
-  transition: all .2s ease;
+  transition: all .2s ease;
 }
 
-    input, select, textarea {
-  border-radius: 6px;
-  border: 1px solid #ccc;
+    input, select, textarea {
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #1b8f5a;
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(27,143,90,.15);
+  border-color: #1b8f5a;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(27,143,90,.15);
 }
 
-    .container h3 {
-  margin-bottom: 20px;
-  color: #1b8f5a;
+    .container h3 {
+  margin-bottom: 20px;
+  color: #1b8f5a;
 }
 
-    .loader-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(255,255,255,.85);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-  display: none;
+    .loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  display: none;
 }
 
 .spinner {
-  width: 60px;
-  height: 60px;
-  border: 6px solid #e0e0e0;
-  border-top: 6px solid #1b8f5a;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+  width: 60px;
+  height: 60px;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #1b8f5a;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 .loader-text {
-  margin-top: 15px;
-  font-weight: 600;
-  color: #1b8f5a;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #1b8f5a;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 .success-box {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(.8);
-  background: #e6f7ef;
-  padding: 30px 40px;
-  border-radius: 16px;
-  text-align: center;
-  box-shadow: 0 15px 30px rgba(0,0,0,.2);
-  display: none;
-  z-index: 10001;
-  animation: successIn .4s ease forwards;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(.8);
+  background: #e6f7ef;
+  padding: 30px 40px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 15px 30px rgba(0,0,0,.2);
+  display: none;
+  z-index: 10001;
+  animation: successIn .4s ease forwards;
 }
 
 .success-box i {
-  font-size: 48px;
-  color: #1b8f5a;
+  font-size: 48px;
+  color: #1b8f5a;
 }
 
 .success-box div {
-  margin-top: 10px;
-  font-weight: 600;
-  color: #1b8f5a;
+  margin-top: 10px;
+  font-weight: 600;
+  color: #1b8f5a;
 }
 
 @keyframes successIn {
-  to {
-    transform: translate(-50%, -50%) scale(1);
-  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
-  </style>
+  </style>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 </head>
 
 <body>
 
 <div id="inicio" class="container pantalla activa" style="display:block">
-    <img src="assets/logo.png" alt="Logo" style="max-width:160px;margin-bottom:15px">
-    <h2>Acceso al Sistema</h2>
-    <p>Ingrese su ID Interno para continuar</p>
-    <input type="password" id="idInterno" placeholder="Contraseña ID" style="text-align:center; font-size:1.2em">
-    <button class="btn" onclick="login()">
-        <i class="fa-solid fa-right-to-bracket"></i> Ingresar
-    </button>
-</div>
+ <img src="assets/logo.png" alt="Logo empresa" style="max-width:160px;margin-bottom:15px">
+  <h2>Sistema de Personal Tarragona</h2>
+  <h4>Bienvenido al sistema de personal Tarragona, por favor seleccione una opción</h4>
+  <button class="btn" onclick="mostrar('sobretiempo')">
+  <i class="fa-solid fa-clock"></i> Registrar Sobretiempo
+</button>
 
-<div id="dashboard" class="container pantalla">
-    <h3 id="bienvenida">¡Hola!</h3>
-    <div id="cardSaldo" style="padding:20px; border-radius:12px; margin:20px 0;">
-        <div style="font-size:0.9em; opacity:0.8">Tu saldo disponible es:</div>
-        <div id="txtSaldo" style="font-size:2em; font-weight:bold;">0h 00m</div>
-    </div>
+<button class="btn" onclick="mostrar('reposicion')">
+  <i class="fa-solid fa-rotate-left"></i> Reposición de Tiempo
+</button>
 
-    <button class="btn" onclick="mostrar('sobretiempo')">
-        <i class="fa-solid fa-clock"></i> Registrar Sobretiempo
-    </button>
-    <button class="btn" onclick="mostrar('reposicion')">
-        <i class="fa-solid fa-rotate-left"></i> Registrar Reposición
-    </button>
-    <button class="btn secondary" onclick="cerrarSesion()">
-        <i class="fa-solid fa-power-off"></i> Salir
-    </button>
+<button class="btn" onclick="mostrar('consulta')">
+  <i class="fa-solid fa-magnifying-glass"></i> Consultar Saldo
+</button>
+
+  <button class="btn secondary" onclick="salirApp()">
+  <i class="fa-solid fa-right-from-bracket"></i> Salir
+</button>
+
+
 </div>
 
 <div id="sobretiempo" class="container pantalla">
-    <h3>Registrar Sobretiempo</h3>
-    <p>Empleado: <strong class="user-name"></strong></p>
-    <label>Fecha</label>
-    <input type="date" id="fechaSobretiempo">
-    <label>Hora Inicio <small>(Fin de semana)</small></label>
-    <input type="time" id="horaEntrada">
-    <label>Hora Salida</label>
-    <input type="time" id="horaSalida">
-    <label>Justificación</label>
-    <textarea id="justificacion"></textarea>
-    <button class="btn" onclick="registrarSobretiempo()">Guardar</button>
-    <button class="btn secondary" onclick="mostrar('dashboard')">Volver</button>
+  <h3>
+  <i class="fa-solid fa-clock"></i>
+  Registro de Sobretiempo
+</h3>
+
+
+  <label>Nombre del empleado</label>
+  <select id="empSobretiempo"></select>
+  <label>Fecha</label>
+  <input type="date" id="fechaSobretiempo">
+  <label>Hora de inicio <small>(solo aplica fin de semana)</small></label>
+  <input type="time" id="horaEntrada">
+  <label>Hora de salida</label>
+  <input type="time" id="horaSalida">
+  <label>Justificación</label>
+  <textarea id="justificacion"></textarea>
+  <button class="btn" id="btnSobretiempo" onclick="registrarSobretiempo()">
+  <i class="fa-solid fa-floppy-disk"></i> Registrar
+</button>
+<button class="btn secondary" onclick="limpiarSobretiempo()">
+  <i class="fa-solid fa-broom"></i> Limpiar
+</button>
+
+  <div id="msgSobretiempo" class="msg"></div>
+  <button class="btn secondary" onclick="volver()">Volver</button>
 </div>
 
 <div id="reposicion" class="container pantalla">
-    <h3>Registrar Reposición</h3>
-    <p>Empleado: <strong class="user-name"></strong></p>
-    <label>Horas a reponer</label>
-    <input type="number" id="horasReposicion" placeholder="Ej: 2">
-    <label>Justificación</label>
-    <textarea id="justificacionReposicion"></textarea>
-    <button class="btn" onclick="registrarReposicion()">Guardar</button>
-    <button class="btn secondary" onclick="mostrar('dashboard')">Volver</button>
+<h3>
+  <i class="fa-solid fa-rotate-left"></i>
+  Reposición de Tiempo
+</h3>
+
+
+  <label>Nombre del empleado</label>
+  <select id="empReposicion"></select>
+  <label>Horas a reponer (Ingresar solo numeros enteros)</label>
+  <input type="number" id="horasReposicion">
+  <label>Justificación</label>
+  <textarea id="justificacionReposicion"></textarea>
+  <button class="btn" onclick="registrarReposicion()">
+  <i class="fa-solid fa-floppy-disk"></i> Registrar
+</button>
+<button class="btn secondary" onclick="limpiarReposicion()">
+  <i class="fa-solid fa-broom"></i> Limpiar
+</button>
+
+  <div id="msgReposicion" class="msg"></div>
+    <button class="btn secondary" onclick="volver()">
+  <i class="fa-solid fa-arrow-left"></i> Volver
+</button>
+
+</div>
+
+<div id="consulta" class="container pantalla">
+<h3>
+  <i class="fa-solid fa-magnifying-glass"></i>
+  Consulta de Tiempo Disponible
+</h3>
+
+
+  <label>Ingrese su ID</label>
+  <input type="password" id="idInterno">
+  <button class="btn" onclick="consultarSaldo()">
+  <i class="fa-solid fa-floppy-disk"></i> Consultar
+</button>
+<button class="btn secondary" onclick="limpiarConsulta()">
+  <i class="fa-solid fa-broom"></i> Limpiar
+</button>
+
+  
+  <div id="resultadoSaldo" class="msg"></div>
+  <button class="btn secondary" onclick="volver()">
+  <i class="fa-solid fa-arrow-left"></i> Volver
+</button>
+
 </div>
 
 <script>
 const API = 'https://script.google.com/macros/s/AKfycbx5IRdG-I0Ykq3U0VzvXqUKE0DUSth_M2qi0Bw5ZOwaGttUqZ96XQQcsDkp2RVgx-J8/exec';
-let usuarioLogueado = null;
-
-// --- GESTIÓN DE INTERFAZ ---
-
-function mostrarLoader() {
-  document.getElementById('loader').style.display = 'flex';
+ function mostrarLoader() {
+  document.getElementById('loader').style.display = 'flex';
 }
 
 function ocultarLoader() {
-  document.getElementById('loader').style.display = 'none';
+  document.getElementById('loader').style.display = 'none';
 }
-
+  
 function mostrar(id) {
-  document.querySelectorAll('.pantalla').forEach(p => {
-    p.classList.remove('activa');
-    p.style.display = 'none';
-  });
-  const pantalla = document.getElementById(id);
-  pantalla.style.display = 'block';
-  setTimeout(() => pantalla.classList.add('activa'), 10);
+  document.querySelectorAll('.pantalla').forEach(p => {
+    p.classList.remove('activa');
+    p.style.display = 'none';
+  });
+
+  const pantalla = document.getElementById(id);
+  pantalla.style.display = 'block';
+
+  setTimeout(() => pantalla.classList.add('activa'), 10);
 }
 
-function mostrarToast(txt, tipo) {
-  const t = document.getElementById('toast');
-  t.innerText = txt;
-  t.className = `toast show ${tipo}`;
-  setTimeout(() => t.classList.remove('show'), 3500);
+function volver() {
+  mostrar('inicio');
+}
+
+
+function post(data) {
+  const form = new URLSearchParams();
+
+  for (let k in data) {
+    if (data[k] !== null && data[k] !== undefined) {
+      form.append(k, data[k]);
+    }
+  }
+
+  return fetch(API, {
+    method: 'POST',
+    body: form
+  }).then(r => r.json());
+}
+
+
+
+function cargarEmpleados(){
+  post({action:'empleados'}).then(emps=>{
+    empSobretiempo.innerHTML = empReposicion.innerHTML =
+      '<option value="">Seleccione</option>';
+    emps.forEach(e=>{
+      empSobretiempo.add(new Option(e.nombre,e.id));
+      empReposicion.add(new Option(e.nombre,e.id));
+    });
+  });
+}
+
+function registrarSobretiempo() {
+
+  if (!empSobretiempo.value || !fechaSobretiempo.value || !horaSalida.value) {
+    mostrarToast('Complete todos los campos obligatorios', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btnSobretiempo');
+  btn.disabled = true;
+  mostrarLoader();
+
+  post({
+    action: 'sobretiempo',
+    idEmpleado: empSobretiempo.value,
+    fecha: fechaSobretiempo.value,
+    horaEntrada: horaEntrada.value || null,
+    horaSalida: horaSalida.value,
+    justificacion: justificacion.value
+  })
+  .then(r => {
+    mostrarCheckExito(`Se registraron ${r.horas} horas ${r.minutos} minutos`);
+    limpiarSobretiempo();
+  })
+  .catch(err => {
+    mostrarToast(err.error || 'Error al registrar', 'error');
+  })
+  .finally(() => {
+    ocultarLoader();
+    btn.disabled = false;
+  });
+}
+
+
+function registrarReposicion() {
+
+  if (!empReposicion.value || !horasReposicion.value) {
+    mostrarToast('Debe seleccionar empleado y horas', 'error');
+    return;
+  }
+
+  mostrarLoader();
+
+  post({
+    action: 'reposicion',
+    idEmpleado: empReposicion.value,
+    horas: Number(horasReposicion.value),
+    justificacion: justificacionReposicion.value
+  })
+  .then(() => {
+    mostrarCheckExito(`Se han repuesto ${horasReposicion.value} horas correctamente`);
+    limpiarReposicion();
+  })
+  .catch(err => {
+    mostrarToast(err.error || 'Error al registrar reposición', 'error');
+  })
+  .finally(() => {
+    ocultarLoader();
+  });
+}
+
+
+
+function consultarSaldo() {
+
+  if (!idInterno.value) {
+    mostrarToast('Ingrese su ID', 'error');
+    return;
+  }
+
+  mostrarLoader();
+
+  post({ action:'saldo', id:idInterno.value })
+    .then(r => {
+      mostrarSaldoModal(
+        `Saldo disponible: ${r.horas} horas ${r.minutos} minutos`
+      );
+      limpiarConsulta();
+    })
+    .catch(err => {
+      mostrarToast(err.error || 'Error al consultar saldo', 'error');
+    })
+    .finally(() => {
+      ocultarLoader();
+    });
+}
+
+
+function limpiarSobretiempo() {
+  empSobretiempo.value = '';
+  fechaSobretiempo.value = '';
+  horaEntrada.value = '';
+  horaSalida.value = '';
+  justificacion.value = '';
+}
+
+function limpiarReposicion() {
+  empReposicion.value = '';
+  horasReposicion.value = '';
+  justificacionReposicion.value = '';
 }
 
 function mostrarCheckExito(texto) {
-  const box = document.getElementById('successBox');
-  document.getElementById('successText').innerText = texto;
-  box.style.display = 'block';
-  setTimeout(() => box.style.display = 'none', 2500);
+  const box = document.getElementById('successBox');
+  document.getElementById('successText').innerText = texto;
+
+  box.style.display = 'block';
+
+  setTimeout(() => {
+    box.style.display = 'none';
+  }, 2500);
 }
 
-// --- COMUNICACIÓN CON API ---
-
-function post(data) {
-  const form = new URLSearchParams();
-  for (let k in data) {
-    if (data[k] !== null && data[k] !== undefined) form.append(k, data[k]);
-  }
-  return fetch(API, { method: 'POST', body: form }).then(r => r.json());
+function mostrarSaldoModal(texto) {
+  document.getElementById('saldoText').innerText = texto;
+  document.getElementById('saldoBox').style.display = 'block';
 }
 
-// --- LÓGICA DE SESIÓN (LOGIN) ---
-
-function login(idManual = null) {
-  const id = idManual || document.getElementById('idInterno').value;
-  if (!id) return mostrarToast('Ingrese su ID', 'error');
-
-  mostrarLoader();
-  post({ action: 'saldo', id: id })
-    .then(r => {
-      usuarioLogueado = r;
-      // Guardar en memoria del navegador
-      localStorage.setItem('tarragona_session_id', id);
-      
-      pintarDashboard(r);
-      mostrar('dashboard');
-      document.getElementById('idInterno').value = '';
-    })
-    .catch(err => {
-      console.error(err);
-      mostrarToast('ID incorrecto o error de acceso', 'error');
-      localStorage.removeItem('tarragona_session_id'); // Limpiar si falló
-    })
-    .finally(ocultarLoader);
+  function cerrarSaldo() {
+  document.getElementById('saldoBox').style.display = 'none';
 }
 
-function actualizarDatosUsuario() {
-  // Refresca el saldo sin cambiar de pantalla
-  if (!usuarioLogueado) return;
-  post({ action: 'saldo', id: usuarioLogueado.id })
-    .then(r => {
-      usuarioLogueado = r;
-      pintarDashboard(r);
-    });
+function salirApp() {
+  if (!confirm('¿Desea salir del sistema?')) return;
+
+  // Intenta cerrar la pestaña
+  window.open('', '_self');
+  window.close();
+
+  // Fallback (si el navegador no permite cerrar)
+  setTimeout(() => {
+    document.body.innerHTML = `
+      <div style="
+        display:flex;
+        height:100vh;
+        align-items:center;
+        justify-content:center;
+        font-family:Arial;
+        color:#555;
+      ">
+        <h3>Puede cerrar esta pestaña con seguridad.</h3>
+      </div>`;
+  }, 200);
 }
 
-function pintarDashboard(r) {
-  document.getElementById('bienvenida').innerText = `¡Hola, ${r.nombre}!`;
-  const txtSaldo = document.getElementById('txtSaldo');
-  const card = document.getElementById('cardSaldo');
-  
-  txtSaldo.innerText = `${r.horas}h ${r.minutos}m`;
-  
-  if (r.esNegativo) {
-    card.style.background = '#fdecea';
-    card.style.color = '#b00020';
-  } else {
-    card.style.background = '#e6f7ef';
-    card.style.color = '#1b8f5a';
-  }
-  document.querySelectorAll('.user-name').forEach(el => el.innerText = r.nombre);
+  function limpiarConsulta() {
+  idInterno.value = '';
 }
 
-function cerrarSesion() {
-  if (!confirm('¿Cerrar sesión?')) return;
-  localStorage.removeItem('tarragona_session_id');
-  usuarioLogueado = null;
-  mostrar('inicio');
-}
+  window.addEventListener('load', cargarEmpleados);
 
-// --- OPERACIONES ---
+</script>
 
-function registrarSobretiempo() {
-  const f = document.getElementById('fechaSobretiempo').value;
-  const s = document.getElementById('horaSalida').value;
-  
-  if (!f || !s) return mostrarToast('Faltan datos obligatorios', 'error');
+<div id="toast" class="toast"></div>
 
-  mostrarLoader();
-  post({
-    action: 'sobretiempo',
-    idEmpleado: usuarioLogueado.id,
-    fecha: f,
-    horaEntrada: document.getElementById('horaEntrada').value || null,
-    horaSalida: s,
-    justificacion: document.getElementById('justificacion').value
-  })
-  .then(r => {
-    mostrarCheckExito(`¡Registrado! +${r.horas}h ${r.minutos}m`);
-    limpiarFormularios();
-    actualizarDatosUsuario(); // Actualiza saldo en el dashboard
-    mostrar('dashboard');
-  })
-  .catch(e => mostrarToast('Error al procesar', 'error'))
-  .finally(ocultarLoader);
-}
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+  <div class="loader-text">Procesando...</div>
+</div>
+<div id="successBox" class="success-box">
+  <i class="fa-solid fa-circle-check"></i>
+  <div id="successText"></div>
+</div>
 
-function registrarReposicion() {
-  const h = document.getElementById('horasReposicion').value;
-  if (!h || h <= 0) return mostrarToast('Ingrese una cantidad válida', 'error');
+  <div id="saldoBox" class="success-box" style="background:#fff7e6; display:none">
+  <i class="fa-solid fa-clock" style="color:#f1c40f"></i>
+  <div id="saldoText" style="color:#333; margin-top:10px"></div>
+  <button class="btn secondary" style="margin-top:15px" onclick="cerrarSaldo()">
+    <i class="fa-solid fa-xmark"></i> Cerrar
+  </button>
+</div>
 
-  mostrarLoader();
-  post({
-    action: 'reposicion',
-    idEmpleado: usuarioLogueado.id,
-    horas: Number(h),
-    justificacion: document.getElementById('justificacionReposicion').value
-  })
-  .then(() => {
-    mostrarCheckExito(`Reposición de ${h}h guardada`);
-    limpiarFormularios();
-    actualizarDatosUsuario(); // Actualiza saldo en el dashboard
-    mostrar('dashboard');
-  })
-  .catch(e => mostrarToast('Error al registrar', 'error'))
-  .finally(ocultarLoader);
-}
-
-function limpiarFormularios() {
-  document.querySelectorAll('input, textarea').forEach(i => {
-    if(i.id !== 'idInterno') i.value = '';
-  });
-}
-
-// --- INICIO AUTOMÁTICO AL CARGAR ---
-
-window.addEventListener('load', () => {
-  const sesionGuardada = localStorage.getItem('tarragona_session_id');
-  if (sesionGuardada) {
-    login(sesionGuardada);
-  }
-});
-  </script>
-  
+  
 </body>
 </html>
-
