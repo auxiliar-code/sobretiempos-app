@@ -491,7 +491,18 @@ function salirApp() {
 }
 
   window.addEventListener('load', cargarEmpleados);
+</script>
 
+   <script>
+function mostrarToast(texto, tipo = 'success') {
+  const toast = document.getElementById('toast');
+  toast.className = `toast show ${tipo}`;
+  toast.innerText = texto;
+
+  setTimeout(() => {
+    toast.className = 'toast';
+  }, 3000);
+}
 </script>
 
 <div id="toast" class="toast"></div>
@@ -516,3 +527,4 @@ function salirApp() {
   
 </body>
 </html>
+
